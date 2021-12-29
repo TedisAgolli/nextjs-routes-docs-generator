@@ -30,8 +30,6 @@ paths:
       parameters:
         - in: query
           name: roomId
-        - in: query
-          name: testthing
     delete:
       parameters:
         - in: query

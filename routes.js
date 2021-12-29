@@ -1,15 +1,21 @@
-const { resolve } = require("path");
+const path = require("path");
 const { readdir } = require("fs").promises;
 const { readFileSync, writeFileSync } = require("fs");
 const { Parser } = require("acorn");
 const recast = require("recast");
 const yaml = require("js-yaml");
 
+const dir = process.argv[2];
+if (!dir) {
+  console.log("Please specify a directory");
+  process.exit(1);
+}
+
 async function getFiles(dir) {
   const dirents = await readdir(dir, { withFileTypes: true });
   const files = await Promise.all(
     dirents.map((dirent) => {
-      const res = resolve(dir, dirent.name);
+      const res = path.resolve(dir, dirent.name);
       return dirent.isDirectory() ? getFiles(res) : res;
     })
   );
@@ -23,26 +29,14 @@ const spec = {
     title: "Swagger API",
     version: "1.0.0",
   },
-  paths: {
-    //     route: {
-    //       METHOD: {
-    //         parameters: [
-    //           {
-    //             in: "body",
-    //             name: "body",
-    //           },
-    //         ],
-    //       },
-    //     },
-  },
+  paths: {},
 };
-getFiles(".././pages/api/").then((files) => {
+getFiles(path.join(dir, "pages", "api")).then((files) => {
   files.forEach((file) => {
     const path = file.split("\\pages\\")[1].split(".")[0];
     content.push(file);
     spec.paths[path] = {};
 
-    console.log(file);
     const ast = Parser.parse(readFileSync(file).toString(), {
       ecmaVersion: "latest",
       sourceType: "module",
