@@ -1,0 +1,16 @@
+{
+  "name": "routes-generator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "routes.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "acorn": "^8.6.0",
+    "js-yaml": "^4.1.0",
+    "recast": "^0.20.5"
+  }
+}
