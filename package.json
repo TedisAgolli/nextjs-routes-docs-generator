@@ -1,16 +1,29 @@
 {
-  "name": "routes-generator",
-  "version": "1.0.0",
-  "description": "",
-  "main": "routes.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "acorn": "^8.6.0",
-    "js-yaml": "^4.1.0",
-    "recast": "^0.20.5"
-  }
+    "name": "nextjs-routes-docs",
+    "version": "0.0.1",
+    "description": "Generate docs for nextjs routes",
+    "bin": {
+        "nextjs-routes": "./index.js"
+    },
+    "scripts": {
+        "test": "jest"
+    },
+    "keywords": [
+        "nextjs",
+        "routes",
+        "docs",
+        "swagger"
+    ],
+    "author": "Tedis Agolli <tedis@hey.com> (https://iamted.is)",
+    "license": "ISC",
+    "dependencies": {
+        "acorn": "^8.6.0",
+        "commander": "^8.3.0",
+        "js-yaml": "^4.1.0",
+        "recast": "^0.20.5"
+    },
+    "devDependencies": {
+        "@types/jest": "^26.0.19",
+        "jest": "^26.6.3"
+    }
 }
