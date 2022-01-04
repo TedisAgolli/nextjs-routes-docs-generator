@@ -18,6 +18,7 @@
     "license": "ISC",
     "dependencies": {
         "acorn": "^8.6.0",
+        "chalk": "^4.1.2",
         "commander": "^8.3.0",
         "js-yaml": "^4.1.0",
         "recast": "^0.20.5"
