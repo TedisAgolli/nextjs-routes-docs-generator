@@ -19,7 +19,7 @@ function generateRoutes(dir, options) {
     paths: {},
   };
 
-  const { text, swagger } = options;
+  const { text, swagger, params } = options;
   const outputBoth = !text && !swagger;
   const apiDir = path.join(dir, "pages", "api");
 
@@ -57,47 +57,47 @@ function generateRoutes(dir, options) {
                       spec.paths[path][method.toLowerCase()] = {};
                     }
 
-                    const varDeclarations = ifStmtPath.value.consequent.body;
-                    varDeclarations.forEach((varDeclaration) => {
-                      if (varDeclaration.declarations) {
-                        varDeclaration.declarations.forEach((declaration) => {
-                          if (declaration.init.type === "MemberExpression") {
-                            if (declaration.init.object.name === reqName) {
-                              const propLocation =
-                                declaration.init.property.name;
-                              const propList = declaration.id.properties
-                                .map((prop) => prop.key.name)
-                                .join(", ");
-                              const propDisplay =
-                                propLocation === "body"
-                                  ? `{body: {${propList}}}`
-                                  : `?${propList}`;
+                    let routeDeclarationText = `${method.toUpperCase()} \t ${path}`;
+                    if (params) {
+                      const varDeclarations = ifStmtPath.value.consequent.body;
+                      varDeclarations.forEach((varDeclaration) => {
+                        if (varDeclaration.declarations) {
+                          varDeclaration.declarations.forEach((declaration) => {
+                            if (declaration.init.type === "MemberExpression") {
+                              if (declaration.init.object.name === reqName) {
+                                const propLocation =
+                                  declaration.init.property.name;
+                                const propList = declaration.id.properties
+                                  .map((prop) => prop.key.name)
+                                  .join(", ");
+                                const propDisplay =
+                                  propLocation === "body"
+                                    ? `{body: {${propList}}}`
+                                    : `?${propList}`;
 
-                              const routeDeclaration = `${method.toUpperCase()} \t ${path} \t ${propDisplay}`;
-                              if (text || outputBoth) {
-                                content.push(routeDeclaration);
-                              }
+                                routeDeclarationText += ` \t ${propDisplay}`;
 
-                              if (swagger || outputBoth) {
-                                spec.paths[path][method.toLowerCase()][
-                                  "parameters"
-                                ] = [];
-                              }
-                              declaration.id.properties.forEach((prop) => {
                                 if (swagger || outputBoth) {
                                   spec.paths[path][method.toLowerCase()][
                                     "parameters"
-                                  ].push({
-                                    in: propLocation.toLowerCase(),
-                                    name: prop.key.name,
+                                  ] = [];
+                                  declaration.id.properties.forEach((prop) => {
+                                    spec.paths[path][method.toLowerCase()][
+                                      "parameters"
+                                    ].push({
+                                      in: propLocation.toLowerCase(),
+                                      name: prop.key.name,
+                                    });
                                   });
                                 }
-                              });
+                              }
                             }
-                          }
-                        });
-                      }
-                    });
+                          });
+                        }
+                      });
+                    }
+
+                    content.push(routeDeclarationText);
                   } else {
                     this.traverse(path);
                   }
@@ -153,7 +153,13 @@ if (require.main === module) {
     .addArgument(new Argument("<dir>", "Nextjs project directory"))
     .option("-t, --text", " text docs")
     .option("-s, --swagger", "swagger docs")
+    .option("-p, --params", "[BETA] parse code to get params")
     .action(function (dir, options, command) {
+      if (options.params) {
+        console.log(
+          chalk.yellow("[WARNING] The parse params feature is still in beta")
+        );
+      }
       generateRoutes(dir, options);
     });
 
