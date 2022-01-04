@@ -3,14 +3,14 @@ info:
   title: Swagger API
   version: 1.0.0
 paths:
-  api\room\join:
+  /api/room/join:
     post:
       parameters:
         - in: body
           name: roomId
         - in: body
           name: user
-  api\room\update:
+  /api/room/update:
     post:
       parameters:
         - in: body
@@ -19,7 +19,7 @@ paths:
           name: roomName
         - in: body
           name: roomSize
-  api\room:
+  /api/room:
     post:
       parameters:
         - in: body
@@ -34,7 +34,7 @@ paths:
       parameters:
         - in: query
           name: roomId
-  api\user:
+  /api/user:
     post:
       parameters:
         - in: body

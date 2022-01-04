@@ -26,7 +26,8 @@ function generateRoutes(dir, options) {
   getFiles(apiDir)
     .then((files) => {
       files.forEach((file) => {
-        const path = file.split("\\pages\\")[1].split(".")[0];
+        const path =
+          "/" + file.split("\\pages\\")[1].split(".")[0].replaceAll("\\", "/");
         if (text || outputBoth) {
           content.push(file);
         }
