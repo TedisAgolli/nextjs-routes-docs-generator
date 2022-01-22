@@ -1,9 +1,9 @@
 {
     "name": "nextjs-routes-docs",
-    "version": "0.0.1",
+    "version": "0.0.4",
     "description": "Generate docs for nextjs routes",
     "bin": {
-        "nextjs-routes": "./index.js"
+        "nextjs-routes-docs": "./index.js"
     },
     "scripts": {
         "test": "jest"
@@ -17,6 +17,7 @@
     "author": "Tedis Agolli <tedis@hey.com> (https://iamted.is)",
     "license": "ISC",
     "dependencies": {
+        "0g": "^0.0.6",
         "acorn": "^8.6.0",
         "chalk": "^4.1.2",
         "commander": "^8.3.0",

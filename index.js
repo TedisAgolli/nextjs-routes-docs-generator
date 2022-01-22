@@ -20,6 +20,7 @@ function generateRoutes(dir, options) {
   };
 
   const { text, swagger, params } = options;
+  const output = options.output ? options.output : ".";
   const outputBoth = !text && !swagger;
   const apiDir = path.join(dir, "pages", "api");
 
@@ -114,13 +115,15 @@ function generateRoutes(dir, options) {
       });
 
       if (text || outputBoth) {
-        writeFileSync("routes", content.join("\n"));
-        console.log(chalk.green("routes file created"));
+        const outputPath = path.join(output, "routes");
+        writeFileSync(outputPath, content.join("\n"));
+        console.log(chalk.green(`${outputPath} file created`));
       }
       if (swagger || outputBoth) {
         // create swagger api file
-        writeFileSync("routes.yml", yaml.dump(spec));
-        console.log(chalk.green("routes.yml file created"));
+        const outputPath = path.join(output, "routes.yml");
+        writeFileSync(outputPath, yaml.dump(spec));
+        console.log(chalk.green(`${outputPath} file created`));
       }
     })
     .catch((err) => {
@@ -151,9 +154,10 @@ if (require.main === module) {
     .name("nextjs-routes")
     .usage("[dir]")
     .addArgument(new Argument("<dir>", "Nextjs project directory"))
-    .option("-t, --text", " text docs")
-    .option("-s, --swagger", "swagger docs")
-    .option("-p, --params", "[BETA] parse code to get params")
+    .option("-t, --text", "Produce text docs")
+    .option("-s, --swagger", "Produce swagger docs")
+    .option("-p, --params", "[BETA] Parse code to get params")
+    .option("-o, --output <value>", "Choose output folder")
     .action(function (dir, options, command) {
       if (options.params) {
         console.log(
