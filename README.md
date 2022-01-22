@@ -22,7 +22,7 @@ npx nextjs-routes-docs [dir]
 npx nextjs-routes-docs --help
 ```
 ```bash
-Usage: nextjs-routes [dir]
+Usage: npx nextjs-routes-docs [dir]
 
 Arguments:
   dir                   Nextjs project directory

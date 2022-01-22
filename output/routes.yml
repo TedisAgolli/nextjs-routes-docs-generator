@@ -4,13 +4,44 @@ info:
   version: 1.0.0
 paths:
   /api/room/join:
-    post: {}
+    post:
+      parameters:
+        - in: body
+          name: roomId
+        - in: body
+          name: user
   /api/room/update:
-    post: {}
+    post:
+      parameters:
+        - in: body
+          name: roomId
+        - in: body
+          name: roomName
+        - in: body
+          name: roomSize
   /api/room:
-    post: {}
-    get: {}
-    delete: {}
+    post:
+      parameters:
+        - in: body
+          name: roomId
+        - in: body
+          name: createdBy
+    get:
+      parameters:
+        - in: query
+          name: roomId
+    delete:
+      parameters:
+        - in: query
+          name: roomId
   /api/user:
-    post: {}
-    get: {}
+    post:
+      parameters:
+        - in: body
+          name: userId
+        - in: body
+          name: userName
+    get:
+      parameters:
+        - in: query
+          name: userId

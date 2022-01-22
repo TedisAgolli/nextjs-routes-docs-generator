@@ -151,7 +151,7 @@ if (require.main === module) {
   program.version("0.0.1");
 
   program
-    .name("nextjs-routes")
+    .name("nextjs-routes-docs")
     .usage("[dir]")
     .addArgument(new Argument("<dir>", "Nextjs project directory"))
     .option("-t, --text", "Produce text docs")
