@@ -2,11 +2,13 @@
 const path = require("path");
 const { readdir } = require("fs").promises;
 const { readFileSync, writeFileSync, existsSync } = require("fs");
+const fs = require("fs");
 const { Parser } = require("acorn");
 const recast = require("recast");
 const yaml = require("js-yaml");
 const { program, Argument } = require("commander");
 const chalk = require("chalk");
+const replaceall = require("replaceall");
 
 function generateRoutes(dir, options) {
   const content = [];
@@ -27,8 +29,7 @@ function generateRoutes(dir, options) {
   getFiles(apiDir)
     .then((files) => {
       files.forEach((file) => {
-        const path =
-          "/" + file.split("\\pages\\")[1].split(".")[0].replaceAll("\\", "/");
+        const path = replaceall("\\", "/", file.split("pages")[1].split(".")[0]);
         if (text || outputBoth) {
           content.push(file);
         }
@@ -43,17 +44,29 @@ function generateRoutes(dir, options) {
         let reqName;
         recast.visit(ast, {
           visitExportDefaultDeclaration: function (mainFunction) {
-            reqName = mainFunction.value.declaration.params[0].name;
+            let mainFunParams = mainFunction.value.declaration.params;
+            let paramsNames = [];
+            mainFunParams.map((param) => { paramsNames.push(param.name) });
             recast.visit(mainFunction, {
               visitIfStatement: function (ifStmtPath) {
-                // console.log(path.value.type);
                 if (ifStmtPath.value.test.type === "BinaryExpression") {
                   const left = ifStmtPath.value.test.left;
+                  try { if (left.object.name) { } } catch (error) {
+                    try { if (left.expression.object.name) { } } catch (error) { return false; }
+                  }
                   if (
-                    left.object.name === reqName &&
-                    left.property.name === "method"
+                    (
+                      paramsNames.includes(left?.object?.name) &&
+                      left.property.name === "method"
+                    )
+                    ||
+                    (
+                      paramsNames.includes(left?.expression?.object?.name) &&
+                      left.expression.property.name === "method"
+                    )
                   ) {
-                    const method = ifStmtPath.value.test.right.value;
+                    const right = ifStmtPath.value.test.right;
+                    const method = right.value;
                     if (swagger || outputBoth) {
                       spec.paths[path][method.toLowerCase()] = {};
                     }
@@ -65,7 +78,7 @@ function generateRoutes(dir, options) {
                         if (varDeclaration.declarations) {
                           varDeclaration.declarations.forEach((declaration) => {
                             if (declaration.init.type === "MemberExpression") {
-                              if (declaration.init.object.name === reqName) {
+                              if (paramsNames.includes(declaration.init.object.name)) {
                                 const propLocation =
                                   declaration.init.property.name;
                                 const propList = declaration.id.properties
@@ -128,6 +141,7 @@ function generateRoutes(dir, options) {
     })
     .catch((err) => {
       console.log(chalk.red(`[ERROR] ${err.message}`));
+      console.error(err)
     });
 }
 module.exports = generateRoutes;
