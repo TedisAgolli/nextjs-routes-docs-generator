@@ -66,10 +66,26 @@ function generateRoutes(dir, options) {
           spec.paths[path] = {};
         }
 
-        const ast = Parser.parse(readFileSync(file).toString(), {
-          ecmaVersion: "latest",
-          sourceType: "module",
-        });
+        const fileSource = readFileSync(file, "utf8").toString();
+        let ast;
+        if (file.endsWith(".ts")) {
+          ast = recast.parse(fileSource, {
+            parser: require("recast/parsers/typescript"),
+          });
+        } else {
+          ast = recast.parse(fileSource, {
+            parser: {
+              parse(source) {
+                return require("acorn").parse(source, {
+                  // additional options
+                  ecmaVersion: "latest",
+                  sourceType: "module",
+                });
+              },
+            },
+          });
+        }
+
         let requestArgumentVariableName;
         recast.visit(ast, {
           visitExportDefaultDeclaration: function (mainFunction) {

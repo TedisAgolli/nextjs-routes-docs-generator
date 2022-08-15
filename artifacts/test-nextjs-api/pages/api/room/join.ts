@@ -1,10 +1,11 @@
 import db from "../../../utils/db";
 import { firestore } from "firebase-admin";
+import type { NextApiRequest, NextApiResponse } from "next";
 
-export default async (req, res) => {
+export default async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     if (req.method === "POST") {
-      const { roomId, user } = req.body;
+      const { roomId, user, testVar } = req.body;
       console.log(roomId, user);
       const { id } = await db
         .collection("rooms")
