@@ -8,6 +8,35 @@ const yaml = require("js-yaml");
 const { program, Argument } = require("commander");
 const chalk = require("chalk");
 
+function extractMethodFromIfStmt(ifStmt, reqVariableName) {
+  if (ifStmt.type === "BinaryExpression") {
+    let literal, variable;
+    if (ifStmt.left.type === "Literal") {
+      literal = ifStmt.left;
+      variable = ifStmt.right;
+    } else {
+      literal = ifStmt.right;
+      variable = ifStmt.left;
+    }
+    if (
+      variable.object.name === reqVariableName &&
+      variable.property.name === "method"
+    )
+      return literal.value;
+  } else {
+    if (ifStmt.left) {
+      const left = extractMethodFromIfStmt(ifStmt.left, reqVariableName);
+      if (left) return left;
+    }
+
+    if (ifStmt.right) {
+      const right = extractMethodFromIfStmt(ifStmt.right, reqVariableName);
+      if (right) return right;
+    }
+  }
+  return null;
+}
+
 function generateRoutes(dir, options) {
   const content = [];
   const spec = {
@@ -41,68 +70,66 @@ function generateRoutes(dir, options) {
           ecmaVersion: "latest",
           sourceType: "module",
         });
-        let reqName;
+        let requestArgumentVariableName;
         recast.visit(ast, {
           visitExportDefaultDeclaration: function (mainFunction) {
-            reqName = mainFunction.value.declaration.params[0].name;
+            requestArgumentVariableName =
+              mainFunction.value.declaration.params[0].name;
             recast.visit(mainFunction, {
               visitIfStatement: function (ifStmtPath) {
-                // console.log(path.value.type);
-                if (ifStmtPath.value.test.type === "BinaryExpression") {
-                  const left = ifStmtPath.value.test.left;
-                  if (
-                    left.object.name === reqName &&
-                    left.property.name === "method"
-                  ) {
-                    const method = ifStmtPath.value.test.right.value;
-                    if (swagger || outputBoth) {
-                      spec.paths[path][method.toLowerCase()] = {};
-                    }
+                const method = extractMethodFromIfStmt(
+                  ifStmtPath.value.test,
+                  requestArgumentVariableName
+                );
+                if (method) {
+                  if (swagger || outputBoth) {
+                    spec.paths[path][method.toLowerCase()] = {};
+                  }
 
-                    let routeDeclarationText = `${method.toUpperCase()} \t ${path}`;
-                    if (params) {
-                      const varDeclarations = ifStmtPath.value.consequent.body;
-                      varDeclarations.forEach((varDeclaration) => {
-                        if (varDeclaration.declarations) {
-                          varDeclaration.declarations.forEach((declaration) => {
-                            if (declaration.init.type === "MemberExpression") {
-                              if (declaration.init.object.name === reqName) {
-                                const propLocation =
-                                  declaration.init.property.name;
-                                const propList = declaration.id.properties
-                                  .map((prop) => prop.key.name)
-                                  .join(", ");
-                                const propDisplay =
-                                  propLocation === "body"
-                                    ? `{body: {${propList}}}`
-                                    : `?${propList}`;
+                  let routeDeclarationText = `${method.toUpperCase()} \t ${path}`;
+                  if (params) {
+                    const varDeclarations = ifStmtPath.value.consequent.body;
+                    varDeclarations.forEach((varDeclaration) => {
+                      if (varDeclaration.declarations) {
+                        varDeclaration.declarations.forEach((declaration) => {
+                          if (declaration.init.type === "MemberExpression") {
+                            if (
+                              declaration.init.object.name ===
+                              requestArgumentVariableName
+                            ) {
+                              const propLocation =
+                                declaration.init.property.name;
+                              const propList = declaration.id.properties
+                                .map((prop) => prop.key.name)
+                                .join(", ");
+                              const propDisplay =
+                                propLocation === "body"
+                                  ? `{body: {${propList}}}`
+                                  : `?${propList}`;
 
-                                routeDeclarationText += ` \t ${propDisplay}`;
+                              routeDeclarationText += ` \t ${propDisplay}`;
 
-                                if (swagger || outputBoth) {
+                              if (swagger || outputBoth) {
+                                spec.paths[path][method.toLowerCase()][
+                                  "parameters"
+                                ] = [];
+                                declaration.id.properties.forEach((prop) => {
                                   spec.paths[path][method.toLowerCase()][
                                     "parameters"
-                                  ] = [];
-                                  declaration.id.properties.forEach((prop) => {
-                                    spec.paths[path][method.toLowerCase()][
-                                      "parameters"
-                                    ].push({
-                                      in: propLocation.toLowerCase(),
-                                      name: prop.key.name,
-                                    });
+                                  ].push({
+                                    in: propLocation.toLowerCase(),
+                                    name: prop.key.name,
                                   });
-                                }
+                                });
                               }
                             }
-                          });
-                        }
-                      });
-                    }
-
-                    content.push(routeDeclarationText);
-                  } else {
-                    this.traverse(path);
+                          }
+                        });
+                      }
+                    });
                   }
+
+                  content.push(routeDeclarationText);
                 }
                 this.traverse(ifStmtPath);
               },

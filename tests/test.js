@@ -1,2 +1,2 @@
 const generateRoutes = require("nextjs-routes-docs");
-generateRoutes("./", {});
+generateRoutes("./artifacts/test-nextjs-api", { params: true });
