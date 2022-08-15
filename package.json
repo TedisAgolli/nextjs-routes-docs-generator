@@ -1,6 +1,6 @@
 {
     "name": "nextjs-routes-docs",
-    "version": "0.0.42",
+    "version": "0.0.50",
     "description": "Generate docs for nextjs routes",
     "bin": {
         "nextjs-routes-docs": "./index.js"
