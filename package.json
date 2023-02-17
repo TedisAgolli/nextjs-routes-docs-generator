@@ -1,31 +1,32 @@
 {
-    "name": "nextjs-routes-docs",
-    "version": "0.0.50",
-    "description": "Generate docs for nextjs routes",
-    "bin": {
-        "nextjs-routes-docs": "./index.js"
-    },
-    "scripts": {
-        "test": "jest"
-    },
-    "keywords": [
-        "nextjs",
-        "routes",
-        "docs",
-        "swagger"
-    ],
-    "author": "Tedis Agolli <tedis@hey.com> (https://iamted.is)",
-    "license": "ISC",
-    "dependencies": {
-        "0g": "^0.0.6",
-        "acorn": "^8.6.0",
-        "chalk": "^4.1.2",
-        "commander": "^8.3.0",
-        "js-yaml": "^4.1.0",
-        "recast": "^0.20.5"
-    },
-    "devDependencies": {
-        "@types/jest": "^26.0.19",
-        "jest": "^26.6.3"
-    }
+  "name": "nextjs-routes-docs",
+  "version": "0.0.61",
+  "description": "Generate docs for nextjs routes",
+  "bin": {
+    "nextjs-routes-docs": "./index.js"
+  },
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [
+    "nextjs",
+    "routes",
+    "docs",
+    "swagger"
+  ],
+  "author": "Tedis Agolli <tedis@hey.com> (https://iamted.is)",
+  "license": "ISC",
+  "dependencies": {
+    "@babel/parser": "^7.20.15",
+    "0g": "^0.0.6",
+    "acorn": "^8.6.0",
+    "chalk": "^4.1.2",
+    "commander": "^8.3.0",
+    "js-yaml": "^4.1.0",
+    "recast": "^0.20.5"
+  },
+  "devDependencies": {
+    "@types/jest": "^26.0.19",
+    "jest": "^26.6.3"
+  }
 }
