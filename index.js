@@ -48,17 +48,18 @@ function generateRoutes(dir, options) {
     paths: {},
   };
 
-  const { text, swagger, params } = options;
+  const { text, swagger, params, app } = options;
   const output = options.output ? options.output : ".";
   const outputBoth = !text && !swagger;
-  const apiDir = path.join(dir, "pages", "api");
+  const mainDir = app ? "app" : "pages";
+  const apiDir = path.join(dir, mainDir, "api");
 
   getFiles(apiDir)
     .then((files) => {
       files.forEach((file) => {
         //todo: handle path that has \\ in folder/file name
         const path =
-          "/" + file.replaceAll("\\", "/").split("/pages/")[1].split(".")[0];
+          "/" + file.replaceAll("\\", "/").split(`/${mainDir}/`)[1].split(".")[0];
         if (text || outputBoth) {
           content.push(file);
         }
@@ -202,6 +203,7 @@ if (require.main === module) {
     .option("-s, --swagger", "Produce swagger docs")
     .option("-p, --params", "[BETA] Parse code to get params")
     .option("-o, --output <value>", "Choose output folder")
+    .option("-a, --app", "Using app directory (Next JS 13)")
     .action(function (dir, options, command) {
       if (options.params) {
         console.log(
